@@ -1,0 +1,10 @@
+Frontend Accelerator Doctor: DEGRADED
+[PASS] Git root: /home/user/Work/Current/accelerator/react-test
+[PASS] Node.js 24.20.0 satisfies the accelerator requirement.
+[PASS] Runtime Toolchain Manifest 7e9501102f9b is valid.
+[PASS] browser capability agent-browser@0.32.3 is ready.
+[PASS] docs capability ctx7@0.5.5 is ready.
+[PASS] claude hooks: ACTIVE
+[DEGRADED] codex hooks: PENDING_ACTIVATION
+[PASS] Existing lint capability found at ..
+Cache: /home/user/.cache/frontend-accelerator

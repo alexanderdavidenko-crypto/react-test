@@ -1,0 +1,63 @@
+{
+  "status": "DEGRADED",
+  "checks": [
+    {
+      "id": "git-root",
+      "status": "PASS",
+      "message": "Git root: /home/user/Work/Current/accelerator/react-test"
+    },
+    {
+      "id": "node",
+      "status": "PASS",
+      "message": "Node.js 24.20.0 satisfies the accelerator requirement."
+    },
+    {
+      "id": "manifest",
+      "status": "PASS",
+      "message": "Runtime Toolchain Manifest 7e9501102f9b is valid."
+    },
+    {
+      "id": "capability:browser",
+      "status": "PASS",
+      "message": "browser capability agent-browser@0.32.3 is ready."
+    },
+    {
+      "id": "capability:docs",
+      "status": "PASS",
+      "message": "docs capability ctx7@0.5.5 is ready."
+    },
+    {
+      "id": "hooks:claude",
+      "status": "PASS",
+      "message": "claude hooks: ACTIVE",
+      "details": {
+        "status": "ACTIVE",
+        "proofPath": "/home/user/.cache/frontend-accelerator/activation/3de66c17aa9e2d8298d44813ede595baba0b7572528493e4b6c864dd4b1b368c/claude.json",
+        "activatedAt": "2026-11-06T09:00:40.638Z"
+      }
+    },
+    {
+      "id": "hooks:codex",
+      "status": "DEGRADED",
+      "message": "codex hooks: PENDING_ACTIVATION",
+      "details": {
+        "status": "PENDING_ACTIVATION",
+        "proofPath": "/home/user/.cache/frontend-accelerator/activation/3de66c17aa9e2d8298d44813ede595baba0b7572528493e4b6c864dd4b1b368c/codex.json"
+      }
+    },
+    {
+      "id": "lint",
+      "status": "PASS",
+      "message": "Existing lint capability found at ..",
+      "details": {
+        "status": "ready",
+        "roots": [
+          "."
+        ]
+      }
+    }
+  ],
+  "targetRoot": "/home/user/Work/Current/accelerator/react-test",
+  "cacheRoot": "/home/user/.cache/frontend-accelerator",
+  "manifestHash": "7e9501102f9b17fee2894cb4fac2c39f989835ee4518f31cfa38075d57c72f79"
+}
