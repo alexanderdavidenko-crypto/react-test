@@ -3,7 +3,7 @@
  * Остальной код не вызывает `new Date(...)` и `toLocale*`.
  */
 
-const ISO_UTC_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/;
+const ISO_UTC_PATTERN = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?Z$/;
 const LOCAL_DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
 const LOCAL_TIME_PATTERN = /^(\d{2}):(\d{2})$/;
 
@@ -23,9 +23,20 @@ export function currentTime(): number {
 
 /** Разбор ISO 8601 UTC (с `Z`, миллисекунды допустимы). `null`, если строка не подходит. */
 export function parseIso(value: string): number | null {
-  if (!ISO_UTC_PATTERN.test(value)) return null;
+  const m = ISO_UTC_PATTERN.exec(value);
+  if (!m) return null;
   const ms = Date.parse(value);
-  return Number.isNaN(ms) ? null : ms;
+  if (Number.isNaN(ms)) return null;
+  // Date.parse нормализует 30 февраля, 31 апреля и 24:00; круговая сверка компонентов отсекает их.
+  const d = new Date(ms);
+  const matches =
+    d.getUTCFullYear() === Number(m[1]) &&
+    d.getUTCMonth() + 1 === Number(m[2]) &&
+    d.getUTCDate() === Number(m[3]) &&
+    d.getUTCHours() === Number(m[4]) &&
+    d.getUTCMinutes() === Number(m[5]) &&
+    d.getUTCSeconds() === Number(m[6]);
+  return matches ? ms : null;
 }
 
 export function isIsoUtc(value: string): boolean {
