@@ -13,7 +13,7 @@
 | Акселератор | frontend-accelerator-toolset 0.1.0, локальная папка `~/Downloads/frontend-accelerator-toolset-main` (распакованный архив, git-ревизии нет), Runtime Toolchain Manifest `7e9501102f9b` |
 | Установка | `npx --package <путь> frontend-accelerator install` (сначала превью, затем `--yes`); `setup --yes` (browser и docs взяты из кэша, REUSED) |
 | Doctor | `DEGRADED`; `claude hooks: ACTIVE`; `codex hooks: PENDING_ACTIVATION` (Codex не используется); не BLOCKED. Вывод: `doctor-output.txt`, `doctor-output.json`, коммит `7905cf2` |
-| Хеш чекпоинта (планирование до coder) | _будет записан отдельным коммитом после чекпоинта_ |
+| Хеш чекпоинта (планирование до coder) | `6a0019e333041eb2197a73bff3236054f200d2e5` (6a0019e, 2026-11-06T15:49:09+01:00, «docs: implementation plan for TASK-001 (planning checkpoint)»). Содержит все артефакты планирования: requirements, architecture, api-integration, ui-design, implementation-plan. Зависимости и конфиги ещё не менялись |
 | Время: начало | 2026-11-06 09:52:41 CET (из `~/Work/assessment-time.txt`; запись сделана командой `date` по ходу подготовки, разработчик подтвердил оставить как есть) |
 | Время: перерывы | Перерывов дольше 15 минут пока не записано. Время между действиями идёт на обдумывание, написание промптов и перекуры, оно входит в активное. |
 | Время: окончание / активное / календарное | _будут записаны разработчиком в конце_ |
@@ -167,7 +167,7 @@
 
 Непроверенное, названное планом: `showModal` в jsdom, фейковые таймеры с MSW/userEvent/debounce, импорт JSON вне `src/` при `resolveJsonModule`, состав `dist`, подхват `VITE_MOCK_SCENARIO`, порядок чтения `?scenario=` и редиректа роутера. Устаревшие места `requirements.md` (расхождение 2) план не правит.
 
-Коммит после роли (чекпоинт): _будет записан_.
+Коммит после роли (чекпоинт): `6a0019e` (2026-11-06T15:49:09+01:00): `implementation-plan.md`, ответы агента `evidence/responses/07-*`, обновление лога. Хеш записан отдельным следующим коммитом (решение 5=C).
 
 ## Ручные действия вне ролей
 
