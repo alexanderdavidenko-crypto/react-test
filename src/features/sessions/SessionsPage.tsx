@@ -50,6 +50,7 @@ export function SessionsPage({ onCreateSession, reloadKey = 0 }: SessionsPagePro
   }
 
   const searchInput = useRef<HTMLInputElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
   const timer = useRef<number | undefined>(undefined);
   const latest = useRef({ pathname, search });
   // Адрес, который мы только что записали сами (replace из поля, статуса или сброса).
@@ -110,6 +111,12 @@ export function SessionsPage({ onCreateSession, reloadKey = 0 }: SessionsPagePro
     replaceFilters(clearFilters);
   }
 
+  function handleRetry(): void {
+    // Блок ошибки исчезает на время повтора вместе с кнопкой: фокус переносится на h1 заранее (ui-design 8).
+    headingRef.current?.focus({ preventScroll: true });
+    retry();
+  }
+
   const total = data?.meta.total ?? 0;
   const rows = data?.data ?? [];
 
@@ -129,7 +136,7 @@ export function SessionsPage({ onCreateSession, reloadKey = 0 }: SessionsPagePro
   return (
     <main className="page">
       <header className="page-header">
-        <h1 tabIndex={-1}>{copy.pageTitle}</h1>
+        <h1 ref={headingRef} tabIndex={-1}>{copy.pageTitle}</h1>
         <button
           type="button"
           className="button button-primary"
@@ -187,7 +194,7 @@ export function SessionsPage({ onCreateSession, reloadKey = 0 }: SessionsPagePro
           <div role="alert" className="state-message">
             <h2>{copy.errorTitle}</h2>
             <p>{copy.errorBody(error)}</p>
-            <button type="button" className="button button-primary" onClick={retry}>
+            <button type="button" className="button button-primary" onClick={handleRetry}>
               {copy.tryAgain}
             </button>
           </div>

@@ -245,13 +245,23 @@ export function CreateSessionDialog({
     create.clearFieldError(FIELD_SERVER_KEY[name]);
   }
 
+  /**
+   * Blur считается уходом пользователя с поля, только пока диалог открыт. Закрытие диалога
+   * (в том числе служебное в эффекте при StrictMode-перемонтировании) снимает фокус с Title,
+   * и без этой проверки ошибка показывалась бы при открытии формы (AC-3.9).
+   */
+  function markTouched(name: FieldName): void {
+    if (dialogRef.current?.open !== true) return;
+    setTouched((current) => ({ ...current, [name]: true }));
+  }
+
   function inputProps(name: FieldName) {
     return {
       name,
       value: values[name],
       readOnly: pending,
       onChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => change(name, event.target.value),
-      onBlur: () => setTouched((current) => ({ ...current, [name]: true })),
+      onBlur: () => markTouched(name),
     };
   }
 
@@ -468,7 +478,7 @@ export function CreateSessionDialog({
                     value={values.coachId}
                     disabled={pending || coaches.status === "loading"}
                     onChange={(event) => change("coachId", event.target.value)}
-                    onBlur={() => setTouched((current) => ({ ...current, coachId: true }))}
+                    onBlur={() => markTouched("coachId")}
                     {...ariaFor("cs-coach", { error: coachFieldError !== undefined })}
                   >
                     <option value="">
