@@ -1,7 +1,7 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import type { UserEvent } from "@testing-library/user-event";
 import { http } from "msw";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App from "../../app/App.tsx";
 import { setMockLatency, errorResponse } from "../../mocks/handlers.ts";
 import { server } from "../../mocks/node.ts";
@@ -29,6 +29,7 @@ beforeEach(() => {
 
 afterEach(() => {
   server.events.removeAllListeners();
+  vi.unstubAllEnvs(); // возвращает TZ, выставленный в тесте
 });
 
 const location = () => window.location.pathname + window.location.search;
@@ -63,6 +64,7 @@ function describedBy(control: HTMLElement): string {
 
 describe("create session", () => {
   it("validates with linked errors, submits exactly once, refreshes the list and opens the new session", async () => {
+    vi.stubEnv("TZ", "Asia/Kolkata"); // явный пояс вместо пояса машины; возвращается в afterEach
     const { user } = renderAt(<App />, "/sessions?scenario=normal");
     await screen.findByRole("link", { name: "U14 Shooting Lab" });
     const listRequests = sessionGets;
@@ -82,7 +84,10 @@ describe("create session", () => {
       "Enter a whole number of places from 1 to 100.",
     );
     expect(describedBy(within(dialog).getByLabelText("Coach"))).toContain("Select a coach.");
-    expect(within(dialog).getByText("8 fields need attention")).toBeTruthy();
+    // Число в объявлении должно совпадать с числом реально подсвеченных контролов (а не с жёстким «8»).
+    const invalidCount = dialog.querySelectorAll('[aria-invalid="true"]').length;
+    expect(invalidCount).toBeGreaterThan(1);
+    expect(within(dialog).getByText(`${invalidCount} fields need attention`)).toBeTruthy();
     expect(posts).toHaveLength(0);
 
     // Дата в прошлом: ошибка пары, связанная с обоими контролами; исправление её снимает.
@@ -119,7 +124,8 @@ describe("create session", () => {
       locationName: "North Court",
       locationAddress: "12 Lake Street",
     });
-    expect((posts[0] as { startsAt: string }).startsAt).toMatch(/^2026-09-1[45]T\d\d:\d\d:00Z$/);
+    // Введено 2026-09-15 18:30 по поясу Asia/Kolkata (+05:30, без перехода): в UTC это 13:00.
+    expect((posts[0] as { startsAt: string }).startsAt).toBe("2026-09-15T13:00:00Z");
     expect(within(dialog).getByText(/“Evening Footwork” is scheduled for/)).toBeTruthy();
 
     // Список перезапрошен и содержит новую сессию; «Open session» открывает её детали.
