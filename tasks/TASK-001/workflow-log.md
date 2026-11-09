@@ -38,6 +38,7 @@
 | 08:54:38 (CET, 2026-11-09) | `/coder` (срез S7: детали) | Изолированный агент; диалог `<dialog>` на `/sessions/:id`, `useSessionDetails`, `CapacitySummary`, закрытие через навигацию, флаг «из списка» в router, essential-тест 7b (1–2 теста), risk-тесты не писать | `SessionDetailsDialog.tsx` (236), `useSessionDetails.ts`, `CapacitySummary.tsx`, `session-details.test.tsx` (2 теста), правки `SessionRow`, `copy.ts`, `shared/router` (+14), `App.css`, `app/App.tsx`; lint, build, test — код 0, 18 тестов. Ответ: `evidence/responses/12-coder-s7-details.md` | Да, следующую роль не запускал; два вопроса к разработчику | _ревью S6+S7, `/coder` S8 — подтвердить_ |
 | 09:03:21 (CET, 2026-11-09) | `/coder` (срез S8: создание) | Изолированный агент; `features/create-session` (форма во втором `<dialog>`, валидация AC-3.x, guard по `coachId`, ошибки полей и формы, coaches-error, экран успеха, подтверждение закрытия), перезапрос списка; essential-тесты 5 и 6, минимум `it`; risk-тесты не писать; спорные UI-решения не принимать самому | `src/features/create-session/*` (9 файлов, ~1200 строк, `CreateSessionDialog.tsx` 640), `create-session.test.tsx` (3 теста), правки `app/App.tsx`, `SessionsPage.tsx`, `datetime.ts` (+17), `App.css` (+174); lint, build, test — код 0, 21 тест. Ответ: `evidence/responses/13-coder-s8-create.md` | Да, следующую роль не запускал; 3 вопроса к разработчику | _ревью S6–S8, `/coder` S9 или `/test-generator` — подтвердить_ |
 | 11:14:22 (CET, 2026-11-09, старт агента) | `/coder` (срез S9: адаптив, доступность, README, полировка) | Изолированный агент; CSS адаптива и фокуса, форматы даты в `datetime`, переименование `details-*`, колонки в `copy`, README | [`evidence/responses/14-coder-s9-polish.md`](evidence/responses/14-coder-s9-polish.md) | да | следующий шаг выбирает разработчик |
+| 13:30:12 (UTC; 14:30:12 CET, 2026-11-09, старт агента) | `/code-reviewer` (S6–S9, `e23e4f7..3d98cd5`) | Изолированный агент; семь направлений: AC и документы, запреты проекта, доступность, гонки, адаптив в коде, качество, тесты | [`evidence/responses/15-code-reviewer-s6-s9.md`](evidence/responses/15-code-reviewer-s6-s9.md), [`review.md`](review.md) | да | исправления по находкам |
 
 ### Промпт роли 1 (дословно, как отправлен)
 
@@ -322,7 +323,17 @@
 
 Решения разработчика по вопросам S7 и S8: _будут записаны_.
 
-Коммит после роли: _будет записан_.
+Коммит после роли: `3d98cd5` (S9).
+
+### Роль 15 `/code-reviewer` (S6–S9)
+
+Промпт: дословно как выдан ассистентом (начинался с `/code-reviewer Запусти изолированного агента code-reviewer…`, диапазон `e23e4f7..3d98cd5`); точный текст из транскрипта основной сессии будет сверен при финальной сборке. Агент работал 13:30:12Z–13:33:45Z.
+
+Ответ: [`evidence/responses/15-code-reviewer-s6-s9.md`](evidence/responses/15-code-reviewer-s6-s9.md); дословная копия в [`review.md`](review.md) (второй раздел, записано мной, у роли нет права записи).
+
+Проверка (моя): транскрипт агента в `subagents/` (тип `code-reviewer`, Bash 42, Read 8, SubagentHandback 1). Вердикт агента: PASS, blocker и major нет, 6 minor (M-1…M-6), 7 nit. Агент сам прогнал vitest (21 тест), tsc и oxlint без замечаний. Выборочно подтверждено мной чтением: M-1 (`App.css:194-200`, `outline: none` на ссылке без запасного варианта вне `:has()`), nit про `viewport-fit=cover` (в `index.html` его нет). Остальные находки по тексту агента, мной не перепроверялись.
+
+Решения разработчика по находкам: _будут записаны_.
 
 ## Ручные действия вне ролей
 
