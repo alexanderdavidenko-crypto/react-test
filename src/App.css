@@ -516,3 +516,177 @@ body:has(dialog[open]) {
     min-height: 44px;
   }
 }
+
+/* Форма создания (S8, начальные стили). Полный адаптив и доводка — S9. Каркас диалога общий с деталями. */
+.form-dialog {
+  width: min(640px, calc(100vw - 32px));
+}
+
+.create-form {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  margin: 0 0 16px;
+  padding: 0;
+  border: 0;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 16px;
+}
+
+.field-label {
+  font-weight: 600;
+  padding: 0;
+}
+
+.field-optional {
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.field-hint {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--text-muted);
+}
+
+.field-error {
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 600;
+  color: var(--danger);
+  margin: -8px 0 16px;
+}
+
+.field .field-error {
+  margin: 0;
+}
+
+.create-form input[type="text"],
+.create-form input[type="date"],
+.create-form input[type="time"],
+.create-form input[type="number"],
+.create-form select,
+.create-form textarea {
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 12px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.create-form textarea {
+  resize: vertical;
+  font: inherit;
+}
+
+.create-form [aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+.input-suffix {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.input-suffix input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.radio-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.radio-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  cursor: pointer;
+}
+
+.coach-problem {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--danger);
+  border-radius: var(--radius);
+}
+
+.form-footer {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.form-error {
+  flex: 1 0 100%;
+  padding: 12px;
+  color: var(--danger);
+  background: #fbe4e2;
+  border-radius: var(--radius);
+  overflow-wrap: anywhere;
+}
+
+.confirm-discard {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex: 1 1 auto;
+}
+
+.confirm-discard p {
+  flex: 1 1 240px;
+  font-weight: 600;
+}
+
+/* Кнопка отправки сохраняет размеры в состоянии pending. */
+.submit-button {
+  min-width: 168px;
+}
+
+.submit-button[aria-disabled="true"] {
+  cursor: progress;
+  opacity: 0.75;
+}
+
+.success-status h2 {
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.success-filters {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+@media (max-width: 640px) {
+  .field-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

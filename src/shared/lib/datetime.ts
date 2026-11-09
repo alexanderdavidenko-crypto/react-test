@@ -155,3 +155,20 @@ export function localToIsoUtc(date: string, time: string): LocalToIsoResult {
   }
   return { ok: true, iso: formatIsoUtc(local.getTime()) };
 }
+
+/** Сводка: `Mon, Aug 3 at 18:00`. Некорректная строка -> пустая строка. */
+export function formatSummaryDateTime(iso: string, options: FormatOptions = {}): string {
+  const ms = parseIso(iso);
+  if (ms === null) return "";
+  const p = partsOf(
+    ms,
+    { weekday: "short", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" },
+    options,
+  );
+  return `${p.weekday}, ${p.month} ${p.day} at ${p.hour}:${p.minute}`;
+}
+
+/** Короткое имя часового пояса на момент `ms` (например `GMT+3`). */
+export function formatTimeZoneName(ms: number, options: FormatOptions = {}): string {
+  return partsOf(ms, { timeZoneName: "short" }, options).timeZoneName ?? "";
+}

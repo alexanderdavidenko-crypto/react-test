@@ -13,19 +13,21 @@ export const SEARCH_DEBOUNCE_MS = 300;
 const SKELETON_ROWS = 5;
 
 interface SessionsPageProps {
-  /** В S6 форма создания не реализована: без обработчика кнопка ничего не делает. */
+  /** Открывает форму создания (состояние открытости живёт в app). */
   onCreateSession?: () => void;
+  /** Сигнал принудительного перезапроса списка (после создания сессии). */
+  reloadKey?: number;
 }
 
 function isStatus(value: string): value is SessionStatus {
   return (SESSION_STATUSES as readonly string[]).includes(value);
 }
 
-export function SessionsPage({ onCreateSession }: SessionsPageProps) {
+export function SessionsPage({ onCreateSession, reloadKey = 0 }: SessionsPageProps) {
   const { pathname, search } = useLocation();
   const filters = readFilters(search);
   const active = hasActiveFilters(filters);
-  const { status, data, error, isRefreshing, retry } = useSessions(filters);
+  const { status, data, error, isRefreshing, retry } = useSessions(filters, reloadKey);
 
   // Локальное transient-значение поля; в URL уходит с debounce. Внешнее изменение URL
   // (Назад, сброс) синхронизируется в поле во время рендера.
@@ -99,7 +101,12 @@ export function SessionsPage({ onCreateSession }: SessionsPageProps) {
     <main className="page">
       <header className="page-header">
         <h1 tabIndex={-1}>{copy.pageTitle}</h1>
-        <button type="button" className="button button-primary" onClick={onCreateSession}>
+        <button
+          type="button"
+          className="button button-primary"
+          data-create-trigger=""
+          onClick={onCreateSession}
+        >
           {copy.createSession}
         </button>
       </header>
