@@ -28,6 +28,20 @@ export function readHistoryState(): unknown {
   return window.history.state;
 }
 
+/** Признак записи истории, созданной переходом из списка (A-11). Теряется при открытии в новой вкладке. */
+export const FROM_LIST_STATE = { fromList: true } as const;
+
+/** `true`, если текущая запись истории открыта переходом из списка и предыдущая запись принадлежит списку. */
+export function cameFromList(): boolean {
+  const state: unknown = window.history.state;
+  return typeof state === "object" && state !== null && "fromList" in state && state.fromList === true;
+}
+
+/** Шаг назад по истории браузера. */
+export function goBack(): void {
+  window.history.back();
+}
+
 function subscribe(onChange: () => void): () => void {
   window.addEventListener("popstate", onChange);
   window.addEventListener(NAVIGATE_EVENT, onChange);
