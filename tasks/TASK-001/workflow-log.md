@@ -47,6 +47,7 @@
 | 15:48:48 (CET, 2026-11-09) | `/browser-verify` (попытка 4, с `--executable-path`) | Изолированный агент; полная проверка в реальном браузере через `agent-browser.mjs` | [`evidence/responses/21-browser-verify.md`](evidence/responses/21-browser-verify.md), [`evidence/browser-verification.md`](evidence/browser-verification.md) | да (FAIL, 4 minor) | правки D-1…D-4 |
 | 16:15:3x (CET, 2026-11-09; команда 15:15:37 UTC) | `/coder` (правки D-1…D-4 и `document.title` по browser-verify) | Изолированный агент; узкая правка | [`evidence/responses/22-coder-bv-fixes.md`](evidence/responses/22-coder-bv-fixes.md) | да | повторный `/browser-verify` |
 | 16:26:43 (CET, 2026-11-09) | `/browser-verify` (повтор по D-1…D-4, с `--executable-path`) | Изолированный агент; выборочная проверка затронутых пунктов | [`evidence/responses/23-browser-verify-recheck.md`](evidence/responses/23-browser-verify-recheck.md), [`evidence/browser-verification.md`](evidence/browser-verification.md) | да (PASS) | `/verify` |
+| 16:40:27 (CET, 2026-11-09) | `/verify` (итоговая проверка на `4edf487`) | Изолированный агент; запуск проверок и поиск запрещённого, без правок | [`evidence/responses/24-verify.md`](evidence/responses/24-verify.md), [`evidence/verification.md`](evidence/verification.md) | да (PASS) | `/docs-generator` |
 
 ### Промпт роли 1 (дословно, как отправлен)
 
@@ -644,7 +645,30 @@ production-код самому), что осталось для browser-verify.
 
 Не проверено агентом: всё из исходного прогона вне перечня повтора; реальный ввод клавишами в сегменты `date` и `time`; контур фокуса у каждого поля формы (измерены Title, Type и `h1`); раскрытые пикеры; production-сборка (всё в dev со StrictMode).
 
-Решения разработчика по N-1 и N-2: _будут записаны_.
+Решения разработчика (2026-11-09): N-1 и N-2 приняты как ограничения (согласно рекомендации ассистента): N-1 недостижимо для реального пользователя, причина до конца не доказана; N-2 — стандартное поведение Chrome для программного фокуса после мыши. Записать в `final-report.md`.
+
+Коммит после роли: `4edf487`.
+
+### Роль 24 `/verify` (итоговая проверка: PASS)
+
+Промпт (дословно из транскрипта основной сессии, `<command-args>` команды `/verify`; отправлен 2026-11-09T15:40:27Z = 16:40:27 CET; агент 15:40:38Z–15:41:17Z):
+
+```text
+Запусти изолированного агента verify через Task/Agent tool, а саму работу роли в основной сессии не делай. Выполни итоговую проверку проекта TASK-001 на текущем коммите (HEAD 4edf487) и верни вердикт PASS, FAIL, BLOCKED или NOT-APPLICABLE по каждой проверке. Ты только запускаешь существующие проверки и ничего не чинишь: код, документы, конфигурации и зависимости не меняй, ничего не ставь, коммиты не делай, файлы не записывай (запись артефакта verification.md сделает разработчик). Что запустить (из корня репозитория /home/user/Work/Current/accelerator/react-test; для каждой команды укажи рабочую директорию, точную команду, код выхода и решающий вывод, а не «всё проходит»):
+1. `git status --short` и `git log --oneline -8` до проверок; `git diff --stat HEAD` после них (должно быть без изменений в отслеживаемых файлах).
+2. `npm run lint`.3. `npm run build` (и покажи, что сборка не оставила неотслеживаемых артефактов: dist должен быть в .gitignore).
+4. `npm run test` (число файлов и тестов, упавшие, пропущенные; если есть skip или todo, перечисли).
+5. Проверка типов: если в package.json нет отдельного скрипта, `npx tsc -p tsconfig.app.json --noEmit` и, если есть, tsconfig.node.json; если команда не существует в проекте, так и напиши (NOT-APPLICABLE), не придумывай.6. Форматирование: если в проекте есть скрипт или конфиг (prettier, oxfmt и т. п.), запусти проверочный режим без записи; если нет, NOT-APPLICABLE.
+7. Запрещённое по правилам проекта (только чтение, поиск по src): `new Date`, `toLocale*`, `Intl` вне src/shared/lib/datetime.ts и тестов; `fetch(` вне src/shared/api/client.ts; импорты из src/mocks вне src/main.tsx, src/mocks и тестов; прямые обращения к внешнему бэкенду. Приведи команды поиска и вывод.8. Задание не должно быть изменено: `git diff c2bc6b7 -- frontend-accelerator-assessment` должен быть пустым (каталог с заданием) и `git ls-files frontend-accelerator-assessment | head` не должен показывать новых файлов относительно c2bc6b7 (покажи фактический вывод).
+9. Чистота дерева: перечисли неотслеживаемые и изменённые файлы после всех команд (ожидаемо только tasks/TASK-001/workflow-log.md, если он ещё менялся разработчиком).
+10. Проверка воспроизводимости с нуля, если можно без побочных эффектов: `git stash list` (пусто?) и `git status --ignored --short | head -20`. Установку зависимостей с нуля (rm -rf node_modules, npm ci) НЕ делай.Если какая-то команда запрещена средой или падает, это BLOCKED или FAIL с точным текстом, без обходов. Ничего не заявляй как пройденное без вывода команды.В конце: общий вердикт, таблица (проверка, команда, cwd, код выхода, решающий вывод), список пропущенных, не применимых и заблокированных проверок с причинами, итоговый git status/diff scope.
+```
+
+Ответ: [`evidence/responses/24-verify.md`](evidence/responses/24-verify.md) (дословно из SubagentHandback); артефакт [`evidence/verification.md`](evidence/verification.md) записан мной (у роли нет права записи).
+
+Проверка (моя): транскрипт агента в `subagents/` (тип `verify`, Bash 12, SubagentHandback 1; в командах агента нет записи, установки и коммитов). Повторно запущены мной: `lint` — 0, `build` — 0, `test` — 0 (12 файлов, 186 тестов), `tsc -p tsconfig.app.json --noEmit` — 0, `tsc -p tsconfig.node.json --noEmit` — 0; `git diff c2bc6b7 -- frontend-accelerator-assessment` — 0 строк; поиск запрещённого пуст; импорты `src/mocks` вне `src/mocks` и тестов — только `src/test/setup.ts`.
+
+Вердикт агента: PASS; форматирование NOT-APPLICABLE (в проекте нет инструмента), установка с нуля не выполнялась по заданию. Замечания агента: `src/test/setup.ts` импортирует `src/mocks` (тестовая инфраструктура, допустимое исключение); vitest предупреждает, что jsdom создаётся 12 раз (не ошибка); harness пометил отчёт совпадением с шаблоном «settings-json» из-за упоминания игнорируемого `.claude/settings.local.json`, инструкций в отчёте нет.
 
 Коммит после роли: _будет записан_.
 
