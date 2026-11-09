@@ -61,6 +61,8 @@ export function useCreateSession(guard: CoachesGuard): UseCreateSessionResult {
         setStatus("success");
         return { kind: "success", session: result.data };
       }
+      // Недостижимо: у POST нет signal (решение 10=A). Ветка оставлена, потому что тип результата
+      // клиента `ApiResult` (публичный контракт shared/api) включает `cancelled`.
       if (result.cancelled) {
         setStatus("idle");
         return { kind: "ignored" };

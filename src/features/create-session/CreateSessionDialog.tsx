@@ -292,8 +292,9 @@ export function CreateSessionDialog({
 
   const startsAtShown = errors.startsAt !== undefined;
   const timeZone = formatTimeZoneName(currentTime());
-  const descriptionLength = values.description.length;
-  const notesLength = values.trainerNotes.length;
+  // Счётчики считают так же, как validate: после trim.
+  const descriptionLength = values.description.trim().length;
+  const notesLength = values.trainerNotes.trim().length;
   const coachFieldError = errors.coachId;
   const coachListUsable = coaches.status === "success" && coaches.coaches.length > 0;
 

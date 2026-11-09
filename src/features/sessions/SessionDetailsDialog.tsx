@@ -210,7 +210,7 @@ export function SessionDetailsDialog({ id }: SessionDetailsDialogProps) {
           ) : null}
 
           {isNotFound ? (
-            <div className="details-state">
+            <div role="alert" className="details-state">
               <h3>{copy.details.notFoundTitle}</h3>
               <p className="muted">{copy.details.notFoundBody}</p>
             </div>

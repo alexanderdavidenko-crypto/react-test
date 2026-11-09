@@ -111,7 +111,8 @@
   margin-bottom: 8px;
 }
 
-.list-content.is-refreshing {
+.list-content.is-refreshing,
+.state-message.is-refreshing {
   opacity: 0.55;
 }
 
@@ -190,14 +191,17 @@
   text-decoration: underline;
 }
 
-/* Фокус рисуется на всей строке (ссылка растянута на неё), а не на тексте названия. */
-.session-link:focus-visible {
-  outline: none;
-}
+/* Фокус рисуется на всей строке (ссылка растянута на неё), а не на тексте названия.
+   Без поддержки :has() остаётся outline на самой ссылке. */
+@supports selector(:has(*)) {
+  .session-link:focus-visible {
+    outline: none;
+  }
 
-.session-row:has(.session-link:focus-visible) {
-  outline: 2px solid var(--focus);
-  outline-offset: -2px;
+  .session-row:has(.session-link:focus-visible) {
+    outline: 2px solid var(--focus);
+    outline-offset: -2px;
+  }
 }
 
 /* Растянутая область клика на всю строку */

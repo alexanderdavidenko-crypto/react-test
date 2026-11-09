@@ -88,25 +88,6 @@ export function formatListDateTime(iso: string, options: FormatOptions = {}): st
   return `${p.month} ${p.day}, ${p.hour}:${p.minute}`;
 }
 
-/** Детали: `Aug 3, 2026, 18:00 GMT+2` (с коротким именем пояса). */
-export function formatDetailsDateTime(iso: string, options: FormatOptions = {}): string {
-  const ms = parseIso(iso);
-  if (ms === null) return "";
-  const p = partsOf(
-    ms,
-    {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      timeZoneName: "short",
-    },
-    options,
-  );
-  return `${p.month} ${p.day}, ${p.year}, ${p.hour}:${p.minute} ${p.timeZoneName}`;
-}
-
 /** Служебные строки (создано/обновлено/отменено): `Aug 3, 2026, 18:00`. */
 export function formatTimestamp(iso: string, options: FormatOptions = {}): string {
   const ms = parseIso(iso);

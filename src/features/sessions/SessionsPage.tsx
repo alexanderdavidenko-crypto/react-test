@@ -27,7 +27,9 @@ export function SessionsPage({ onCreateSession, reloadKey = 0 }: SessionsPagePro
   const { pathname, search } = useLocation();
   const filters = readFilters(search);
   const active = hasActiveFilters(filters);
-  const { status, data, error, isRefreshing, retry } = useSessions(filters, reloadKey);
+  const { status, data, error, shownFilters, isRefreshing, retry } = useSessions(filters, reloadKey);
+  // При перезапросе прежнее пустое состояние остаётся на экране приглушённым (ui-design 9, 13).
+  const stateClass = isRefreshing ? "state-message is-refreshing" : "state-message";
 
   // Локальное transient-значение поля; в URL уходит с debounce. Внешнее изменение URL
   // (Назад, сброс) синхронизируется в поле во время рендера.
@@ -37,21 +39,42 @@ export function SessionsPage({ onCreateSession, reloadKey = 0 }: SessionsPagePro
     setSeenQuery(filters.query);
     if (filters.query !== text.trim()) setText(filters.query);
   }
+  // «Фильтры сброшены» относится только к состоянию фильтров сразу после «Clear filters».
+  // Любое изменение фильтров из URL (в том числе Назад/Вперёд) сбрасывает флаг во время рендера.
+  const filtersKey = JSON.stringify([filters.query, filters.status]);
   const [justCleared, setJustCleared] = useState(false);
+  const [seenFiltersKey, setSeenFiltersKey] = useState(filtersKey);
+  if (seenFiltersKey !== filtersKey) {
+    setSeenFiltersKey(filtersKey);
+    if (justCleared) setJustCleared(false);
+  }
 
   const searchInput = useRef<HTMLInputElement>(null);
   const timer = useRef<number | undefined>(undefined);
   const latest = useRef({ pathname, search });
+  // Адрес, который мы только что записали сами (replace из поля, статуса или сброса).
+  const ownNavigation = useRef<string | null>(null);
   useEffect(() => {
     latest.current = { pathname, search };
-  });
+    // Внешняя навигация (Назад/Вперёд, ссылка) отменяет отложенную запись поиска (AC-1.11).
+    if (ownNavigation.current === `${pathname}${search}`) {
+      ownNavigation.current = null;
+    } else if (timer.current !== undefined) {
+      window.clearTimeout(timer.current);
+      timer.current = undefined;
+      // Поле не должно показывать текст, который так и не попал в URL.
+      setText(readFilters(search).query);
+    }
+  }, [pathname, search]);
   useEffect(() => () => window.clearTimeout(timer.current), []);
 
   function replaceFilters(next: (search: string) => string): void {
     const current = latest.current;
     const nextSearch = next(current.search);
     if (nextSearch === current.search) return;
-    navigate(`${current.pathname}${nextSearch}`, { replace: true, state: readHistoryState() });
+    const target = `${current.pathname}${nextSearch}`;
+    ownNavigation.current = target;
+    navigate(target, { replace: true, state: readHistoryState() });
   }
 
   function writeUpdate(update: FilterUpdate): void {
@@ -63,7 +86,10 @@ export function SessionsPage({ onCreateSession, reloadKey = 0 }: SessionsPagePro
     setText(value);
     setJustCleared(false);
     window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => writeUpdate({ query: value }), SEARCH_DEBOUNCE_MS);
+    timer.current = window.setTimeout(() => {
+      timer.current = undefined;
+      writeUpdate({ query: value });
+    }, SEARCH_DEBOUNCE_MS);
   }
 
   function handleStatusChange(event: ChangeEvent<HTMLSelectElement>): void {
@@ -74,8 +100,11 @@ export function SessionsPage({ onCreateSession, reloadKey = 0 }: SessionsPagePro
 
   function handleClear(): void {
     window.clearTimeout(timer.current);
+    timer.current = undefined;
     setText("");
     setJustCleared(true);
+    // Ключ сброшенных фильтров фиксируем сразу, чтобы сам сброс не обнулил флаг.
+    setSeenFiltersKey(JSON.stringify(["", ""]));
     // Фокус переносится до того, как кнопка исчезнет вместе с фильтрами.
     searchInput.current?.focus();
     replaceFilters(clearFilters);
@@ -174,17 +203,17 @@ export function SessionsPage({ onCreateSession, reloadKey = 0 }: SessionsPagePro
           </ul>
         ) : null}
 
-        {data !== null && status !== "error" && rows.length === 0 && status === "success" ? (
-          active ? (
-            <div className="state-message">
+        {data !== null && status !== "error" && rows.length === 0 ? (
+          hasActiveFilters(shownFilters) ? (
+            <div className={stateClass}>
               <h2>{copy.noMatchTitle}</h2>
-              <p>{copy.noMatchBody(filters)}</p>
+              <p>{copy.noMatchBody(shownFilters)}</p>
               <button type="button" className="button button-secondary" onClick={handleClear}>
                 {copy.clearFilters}
               </button>
             </div>
           ) : (
-            <div className="state-message">
+            <div className={stateClass}>
               <h2>{copy.emptyTitle}</h2>
               <p>{copy.emptyBody}</p>
               <button type="button" className="button button-primary" onClick={onCreateSession}>
