@@ -693,7 +693,7 @@ production-код самому), что осталось для browser-verify.
 
 Одновременно обновлены документы (мной): `requirements.md` (версия 3, Q-8 и Q-9 закрыты, раздел «Готовность»), `review.md` (статусы M-2 и M-3), плейсхолдеры решений в `workflow-log.md`.
 
-Коммит после роли: _будет записан_.
+Коммит после роли: `929de29` (`docs: final report, requirements sync, artifacts layout`).
 
 ## Ручные действия вне ролей
 
@@ -710,6 +710,7 @@ production-код самому), что осталось для browser-verify.
 | 10:07:45 | Коммит `7905cf2` с выводом Doctor | Фиксация результата |
 | после 10:07 | `git branch --unset-upstream` | Upstream `origin/main` отсутствовал (пуш не требуется) |
 | после чекпоинта `6a0019e` (15:49), до `/coder` (S0 из `implementation-plan.md`, раздел 7) | Вручную: `npm i -D vitest @testing-library/react @testing-library/user-event jsdom`; `npm pkg set scripts.test="vitest run"`; правка `vite.config.ts` (импорт `defineConfig` из `vitest/config`, секция `test`: `environment: jsdom`, `setupFiles: ./src/test/setup.ts`). Первая попытка дала ошибку типов TS «'test' does not exist in type 'UserConfigExport'», потому что секция `test` была добавлена при импорте из `vite`; исправлено заменой импорта на `vitest/config`. Версии: vitest 5.1.0, jsdom 31.0.0, @testing-library/react 16.3.3, @testing-library/user-event 14.6.8. После установки `npm run lint` — код 0, `npm run build` — код 0 (шаблонное приложение, проверено ассистентом по просьбе разработчика) | Нет раннера и DOM-окружения (AC-10.4); AC-9.1/9.3 требуют автотестов через HTTP-границу MSW. Компромисс: четыре dev-зависимости, jsdom не вычисляет layout и может неполно реализовывать `<dialog>.showModal()`, без jest-dom утверждения многословнее; в рантайм приложения не попадают (AC-10.8). Редактор переформатировал `vite.config.ts` (двойные кавычки, точки с запятой) — на поведение не влияет. `npm run test` пока не запускался: `src/test/setup.ts` появится на S5. Коммит: `c921fba` (2026-11-06T16:11:05+01:00, «chore: install test stack (vitest, testing-library, jsdom)») |
+| 2026-11-09 после коммита `929de29` (CET, время не фиксировалось) | Проверка в чистом клоне (выполнил ассистент по просьбе разработчика): `git clone` текущего репозитория во временный каталог (scratchpad сессии-помощника), `npm ci`, `npm run lint`, `npm run build`, `npm run test` | Клон на `929de29`, рабочее дерево чистое; `npm ci` — код 0 (139 пакетов, Node 24.20.0, npm 11.19.0; `msw` postinstall не выполнялся из-за политики скриптов, `public/mockServiceWorker.js` лежит в репозитории); `lint` — 0; `build` — 0; `test` — 0 (12 файлов, 186 тестов); `git diff c2bc6b7 -- frontend-accelerator-assessment` — 0 строк |
 
 Примечание: точные минуты для строк с «~» не зафиксированы отдельно; верхняя граница — время коммита `c2bc6b7` (09:53:19), нижняя — старт 09:52:41.
 
