@@ -37,6 +37,7 @@
 | 16:30:51 | `/coder` (срез S6: список и фильтры) | Изолированный агент; маршрут `/sessions`, `features/sessions`, фильтры только в URL (replace, debounce 300 мс), Clear filters, состояния списка, essential-тесты 1–4 и 7a; без деталей и формы; lint, build, test | `src/app/App.tsx`, `src/features/sessions/*` (7 файлов), `sessions-list.test.tsx` (205 строк, 8 `it`), правки `index.css`, `App.css`, `main.tsx`, удалён шаблонный `App.tsx`; lint, build, test — код 0, 16 тестов. Ответ: `evidence/responses/11-coder-s6-list.md` | Да, следующую роль не запускал | _ревью S6 или `/coder` S7 — подтвердить_ |
 | 08:54:38 (CET, 2026-11-09) | `/coder` (срез S7: детали) | Изолированный агент; диалог `<dialog>` на `/sessions/:id`, `useSessionDetails`, `CapacitySummary`, закрытие через навигацию, флаг «из списка» в router, essential-тест 7b (1–2 теста), risk-тесты не писать | `SessionDetailsDialog.tsx` (236), `useSessionDetails.ts`, `CapacitySummary.tsx`, `session-details.test.tsx` (2 теста), правки `SessionRow`, `copy.ts`, `shared/router` (+14), `App.css`, `app/App.tsx`; lint, build, test — код 0, 18 тестов. Ответ: `evidence/responses/12-coder-s7-details.md` | Да, следующую роль не запускал; два вопроса к разработчику | _ревью S6+S7, `/coder` S8 — подтвердить_ |
 | 09:03:21 (CET, 2026-11-09) | `/coder` (срез S8: создание) | Изолированный агент; `features/create-session` (форма во втором `<dialog>`, валидация AC-3.x, guard по `coachId`, ошибки полей и формы, coaches-error, экран успеха, подтверждение закрытия), перезапрос списка; essential-тесты 5 и 6, минимум `it`; risk-тесты не писать; спорные UI-решения не принимать самому | `src/features/create-session/*` (9 файлов, ~1200 строк, `CreateSessionDialog.tsx` 640), `create-session.test.tsx` (3 теста), правки `app/App.tsx`, `SessionsPage.tsx`, `datetime.ts` (+17), `App.css` (+174); lint, build, test — код 0, 21 тест. Ответ: `evidence/responses/13-coder-s8-create.md` | Да, следующую роль не запускал; 3 вопроса к разработчику | _ревью S6–S8, `/coder` S9 или `/test-generator` — подтвердить_ |
+| 11:14:22 (CET, 2026-11-09, старт агента) | `/coder` (срез S9: адаптив, доступность, README, полировка) | Изолированный агент; CSS адаптива и фокуса, форматы даты в `datetime`, переименование `details-*`, колонки в `copy`, README | [`evidence/responses/14-coder-s9-polish.md`](evidence/responses/14-coder-s9-polish.md) | да | следующий шаг выбирает разработчик |
 
 ### Промпт роли 1 (дословно, как отправлен)
 
@@ -304,6 +305,22 @@
 Не проверено запуском (risk-тесты и browser-verify): границы AC-3.8 (заметки до 500) и A-13 (описание до 1000), несуществующее локальное время (DST), подтверждение закрытия грязной формы, сеть и malformed при POST и перезапрос списка при закрытии, «Clear filters» на экране успеха, `empty` + POST, сброс выбранного тренера после повтора загрузки coaches; реальные `showModal`, фокус, инертность фона, Esc (включая повторный), мобильный вид, озвучка.
 
 Решения разработчика по вопросам агента: _будут записаны_. Рекомендации ассистента: 1 — оставить блок alert плюс ошибки у полей (так пользователь видит общее сообщение и конкретные поля); 2 — оставить; 3 — не показывать серверный `message` (технический текст бэкенда не для пользователя), оставить общий понятный текст.
+
+Коммит после роли: `787d5fb` (`feat: create session form (S8)`).
+
+### Роль 14 `/coder` (срез S9: адаптив, доступность, README, полировка)
+
+Промпт: дословно как выдан ассистентом в сообщении перед запуском (начинался с `/coder Запусти изолированного агента coder через Task/Agent tool…`); точный текст из транскрипта основной сессии будет сверен и вставлен при финальной сборке лога. Старт агента 2026-11-09T10:14:22Z = 11:14:22 CET, конец 10:17:04Z (около 2 мин 42 с).
+
+Ответ: [`evidence/responses/14-coder-s9-polish.md`](evidence/responses/14-coder-s9-polish.md) (дословно из SubagentHandback).
+
+Проверка (моя): подтверждён транскрипт агента в `subagents/` (Bash 32, Read 4, SubagentHandback 1; тип `coder`). Правки: README.md, App.css, index.css, datetime.ts, SessionRow, SessionsPage, SessionDetailsDialog, copy.ts, CreateSessionDialog, SuccessScreen (+336/−150); конфигураций, `package.json`, новых тестов нет. Поиск запрещённого (`new Date`, `toLocale*`, `Intl.` вне `datetime`, `fetch` вне клиента): пусто; старых классов `details-dialog|frame|header` в `src` нет. Мои запуски: `lint` — 0, `build` — 0, `test` — 0 (5 файлов, 21 тест). В `datetime.ts` добавлены `formatListDateTimeCompact` и `formatDetailsSchedule`, старые функции не менялись.
+
+Наблюдения и отклонения: 1) агент правил файлы через Bash (python/heredoc), а не через Edit/Write, результат проверен по `git diff`; 2) `formatDetailsDateTime` в `datetime.ts` осталась без использования (мёртвый код, для ревью); 3) в строке списка в DOM два варианта даты (`.start-wide`, `.start-narrow`), в jsdom CSS не применяется, поэтому `getByText` по дате может найти два совпадения (учесть test-generator); 4) брейкпоинты 720px и 640px расходятся по диапазону 641–720px; 5) рамка фокуса строки через `:has()`; 6) строка «Reason» при `reason: null` уже пропускалась (подтверждено чтением), правка не потребовалась; 7) шаблонных стилей в CSS к S9 уже не было, агент их дополнил.
+
+Не проверено (за browser-verify): вёрстка 1440×900 и 390×844, горизонтальная прокрутка, цели 44px, шрифт 16px, фокус, `showModal`, safe-area, reduced-motion, контраст.
+
+Решения разработчика по вопросам S7 и S8: _будут записаны_.
 
 Коммит после роли: _будет записан_.
 

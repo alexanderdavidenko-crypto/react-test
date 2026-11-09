@@ -198,11 +198,11 @@ export function SessionsPage({ onCreateSession, reloadKey = 0 }: SessionsPagePro
           <div className={isRefreshing ? "list-content is-refreshing" : "list-content"}>
             <p className="list-count">{copy.sessionsCount(total)}</p>
             <div className="session-list-head" aria-hidden="true">
-              <span>Session</span>
-              <span>Start</span>
-              <span>Coach</span>
-              <span>Capacity</span>
-              <span>Status</span>
+              <span>{copy.columns.session}</span>
+              <span>{copy.columns.start}</span>
+              <span>{copy.columns.coach}</span>
+              <span>{copy.columns.capacity}</span>
+              <span>{copy.columns.status}</span>
             </div>
             <ul className="session-list">
               {rows.map((session) => (

@@ -300,14 +300,14 @@ export function CreateSessionDialog({
   return (
     <dialog
       ref={dialogRef}
-      className="details-dialog form-dialog"
+      className="dialog form-dialog"
       aria-labelledby="create-title"
       onCancel={handleCancelEvent}
       onClose={handleNativeClose}
     >
-      <div className="details-frame">
-        <header className="details-header">
-          <div className="details-header-main">
+      <div className="dialog-frame">
+        <header className="dialog-header">
+          <div className="dialog-header-main">
             {succeeded ? null : (
               <h2 id="create-title" ref={headingRef} tabIndex={-1}>
                 {copy.dialogTitle}
@@ -316,7 +316,7 @@ export function CreateSessionDialog({
           </div>
           <button
             type="button"
-            className="details-close"
+            className="dialog-close"
             aria-label={copy.closeAria}
             disabled={pending}
             onClick={requestClose}
@@ -337,7 +337,7 @@ export function CreateSessionDialog({
           />
         ) : (
           <form className="create-form" noValidate aria-busy={pending} onSubmit={handleSubmit}>
-            <div className="details-body">
+            <div className="dialog-body">
               <Field id="cs-title" label={copy.labels.title} hint={copy.hints.title} error={errors.title}>
                 <input
                   id="cs-title"
@@ -591,7 +591,7 @@ export function CreateSessionDialog({
               </div>
             </div>
 
-            <footer className="details-footer form-footer">
+            <footer className="dialog-footer form-footer">
               {create.error === null ? null : (
                 <div ref={blockRef} role="alert" tabIndex={-1} className="form-error">
                   <p>{copy.formError(create.error)}</p>

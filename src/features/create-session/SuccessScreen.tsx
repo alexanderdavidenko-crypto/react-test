@@ -35,7 +35,7 @@ export function SuccessScreen({
 
   return (
     <>
-      <div className="details-body">
+      <div className="dialog-body">
         <div role="status" className="success-status">
           <h2 id="create-title" ref={headingRef} tabIndex={-1}>
             {copy.success.title}
@@ -52,7 +52,7 @@ export function SuccessScreen({
           </div>
         ) : null}
       </div>
-      <footer className="details-footer form-footer">
+      <footer className="dialog-footer form-footer">
         <button type="button" className="button button-secondary" onClick={onClose}>
           {copy.success.close}
         </button>

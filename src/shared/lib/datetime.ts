@@ -172,3 +172,34 @@ export function formatSummaryDateTime(iso: string, options: FormatOptions = {}):
 export function formatTimeZoneName(ms: number, options: FormatOptions = {}): string {
   return partsOf(ms, { timeZoneName: "short" }, options).timeZoneName ?? "";
 }
+
+/** Список на мобильном (ui-design 4.3): `Mon, Aug 3 · 18:00`. Некорректная строка -> пустая строка. */
+export function formatListDateTimeCompact(iso: string, options: FormatOptions = {}): string {
+  const ms = parseIso(iso);
+  if (ms === null) return "";
+  const p = partsOf(
+    ms,
+    { weekday: "short", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" },
+    options,
+  );
+  return `${p.weekday}, ${p.month} ${p.day} · ${p.hour}:${p.minute}`;
+}
+
+/** Расписание в деталях (ui-design 5.2, п. 2): `Monday, Aug 3 at 18:00 (GMT+3)`. */
+export function formatDetailsSchedule(iso: string, options: FormatOptions = {}): string {
+  const ms = parseIso(iso);
+  if (ms === null) return "";
+  const p = partsOf(
+    ms,
+    {
+      weekday: "long",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZoneName: "short",
+    },
+    options,
+  );
+  return `${p.weekday}, ${p.month} ${p.day} at ${p.hour}:${p.minute} (${p.timeZoneName})`;
+}

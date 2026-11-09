@@ -1,6 +1,6 @@
 import type { MouseEvent } from "react";
 import type { SessionSummary } from "../../shared/api/types.ts";
-import { formatListDateTime } from "../../shared/lib/datetime.ts";
+import { formatListDateTime, formatListDateTimeCompact } from "../../shared/lib/datetime.ts";
 import { FROM_LIST_STATE, navigate } from "../../shared/router/index.ts";
 import { copy, TYPE_LABELS } from "./copy.ts";
 import { StatusBadge } from "./StatusBadge.tsx";
@@ -51,13 +51,22 @@ export function SessionRow({ session, search }: SessionRowProps) {
         </span>
       </div>
       <div className="cell cell-start">
-        <span>
+        {/* Десктоп: две строки; мобильный: одна (ui-design 4.3). Скрытый CSS-ом вариант вне дерева доступности. */}
+        <div className="start-wide">
+          <span>
+            <span className="visually-hidden">{copy.sr.starts}</span>
+            {formatListDateTime(session.startsAt)}
+          </span>
+          <span className="muted small">
+            <span className="visually-hidden">{copy.sr.duration}</span>
+            {copy.durationMinutes(session.durationMinutes)}
+          </span>
+        </div>
+        <span className="start-narrow">
           <span className="visually-hidden">{copy.sr.starts}</span>
-          {formatListDateTime(session.startsAt)}
-        </span>
-        <span className="muted small">
-          <span className="visually-hidden">{copy.sr.duration}</span>
-          {copy.durationMinutes(session.durationMinutes)}
+          {formatListDateTimeCompact(session.startsAt)}
+          {" · "}
+          {copy.durationShort(session.durationMinutes)}
         </span>
       </div>
       <div className="cell cell-coach">

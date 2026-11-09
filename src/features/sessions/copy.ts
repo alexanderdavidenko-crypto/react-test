@@ -46,6 +46,16 @@ export const copy = {
     `${n} ${n === 1 ? "session matches" : "sessions match"} your filters`,
   filtersCleared: (countText: string): string => `Filters cleared. ${countText}.`,
   durationMinutes: (n: number): string => plural(n, "minute", "minutes"),
+  durationShort: (n: number): string => `${n} min`,
+
+  // Заголовки колонок списка (визуальные, aria-hidden; CSS приводит к верхнему регистру).
+  columns: {
+    session: "Session",
+    start: "Start",
+    coach: "Coach",
+    capacity: "Capacity",
+    status: "Status",
+  },
 
   noMatchBody: (filters: SessionFilters): string => {
     const status = filters.status === "" ? "" : STATUS_LABELS[filters.status];

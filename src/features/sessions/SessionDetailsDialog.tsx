@@ -1,6 +1,6 @@
 import { useEffect, useRef, type MouseEvent, type SyntheticEvent } from "react";
 import type { SessionDetails } from "../../shared/api/types.ts";
-import { formatDetailsDateTime, formatTimestamp } from "../../shared/lib/datetime.ts";
+import { formatDetailsSchedule, formatTimestamp } from "../../shared/lib/datetime.ts";
 import { cameFromList, goBack, navigate, useLocation } from "../../shared/router/index.ts";
 import { CapacitySummary } from "./CapacitySummary.tsx";
 import { copy, TYPE_LABELS, VISIBILITY_LABELS } from "./copy.ts";
@@ -54,7 +54,7 @@ function DetailsBody({ details }: { details: SessionDetails }) {
       <CancellationBlock details={details} />
       <section className="details-section">
         <h3>{copy.details.schedule}</h3>
-        <p>{formatDetailsDateTime(details.startsAt)}</p>
+        <p>{formatDetailsSchedule(details.startsAt)}</p>
         <p className="muted">{copy.durationMinutes(details.durationMinutes)}</p>
       </section>
       <section className="details-section">
@@ -161,14 +161,14 @@ export function SessionDetailsDialog({ id }: SessionDetailsDialogProps) {
   return (
     <dialog
       ref={dialogRef}
-      className="details-dialog"
+      className="dialog"
       aria-labelledby="details-title"
       onCancel={handleCancel}
       onClick={handleBackdropClick}
     >
-      <div className="details-frame">
-        <header className="details-header">
-          <div className="details-header-main">
+      <div className="dialog-frame">
+        <header className="dialog-header">
+          <div className="dialog-header-main">
             <span className="details-label">{copy.details.label}</span>
             <h2 id="details-title" ref={headingRef} tabIndex={-1}>
               {title}
@@ -177,7 +177,7 @@ export function SessionDetailsDialog({ id }: SessionDetailsDialogProps) {
           </div>
           <button
             type="button"
-            className="details-close"
+            className="dialog-close"
             aria-label={copy.details.closeAria}
             onClick={close}
           >
@@ -185,7 +185,7 @@ export function SessionDetailsDialog({ id }: SessionDetailsDialogProps) {
           </button>
         </header>
 
-        <div className="details-body">
+        <div className="dialog-body">
           {status === "loading" || status === "idle" ? (
             <>
               <div role="status" className="visually-hidden">
@@ -219,7 +219,7 @@ export function SessionDetailsDialog({ id }: SessionDetailsDialogProps) {
           {status === "success" && data !== null ? <DetailsBody details={data} /> : null}
         </div>
 
-        <footer className="details-footer">
+        <footer className="dialog-footer">
           {isNotFound ? (
             <button type="button" className="button button-primary" onClick={close}>
               {copy.details.backToSessions}

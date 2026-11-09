@@ -30,9 +30,29 @@
   box-sizing: border-box;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
   min-width: 320px;
+}
+
+a {
+  color: var(--primary);
+}
+
+button,
+select,
+summary,
+[role="button"] {
+  touch-action: manipulation;
+}
+
+a,
+button {
+  -webkit-tap-highlight-color: rgb(8 127 114 / 0.15);
 }
 
 h1,
@@ -43,7 +63,8 @@ p {
 
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
   color: inherit;
 }
@@ -63,6 +84,17 @@ select {
   clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
+}
+
+/* Анимация необязательна: при reduce отключаются все (в том числе будущие). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 @media (max-width: 720px) {
