@@ -44,6 +44,7 @@
 | 15:18:53 (CET, 2026-11-09) | `/browser-verify` (попытка 1) | Изолированный агент; проверка приложения в реальном браузере через `agent-browser.mjs` | [`evidence/responses/18-browser-verify-blocked.md`](evidence/responses/18-browser-verify-blocked.md) | да (BLOCKED) | разблокировать запуск браузера и повторить |
 | 15:25:06 (CET, 2026-11-09) | `/browser-verify` (попытка 2, вариант A) | Изолированный агент; то же задание, запуск адаптера вне песочницы | [`evidence/responses/19-browser-verify-blocked-2.md`](evidence/responses/19-browser-verify-blocked-2.md) | да (BLOCKED) | найти причину на хосте |
 | 15:37:53 (CET, 2026-11-09) | `/browser-verify` (попытка 3, запуск из сессии-помощника по просьбе разработчика) | Изолированный агент; то же задание, `AGENT_BROWSER_EXECUTABLE_PATH` в окружении | [`evidence/responses/20-browser-verify-blocked-3.md`](evidence/responses/20-browser-verify-blocked-3.md) | да (BLOCKED) | `--executable-path` в каждой команде адаптера |
+| 15:48:48 (CET, 2026-11-09) | `/browser-verify` (попытка 4, с `--executable-path`) | Изолированный агент; полная проверка в реальном браузере через `agent-browser.mjs` | [`evidence/responses/21-browser-verify.md`](evidence/responses/21-browser-verify.md), [`evidence/browser-verification.md`](evidence/browser-verification.md) | да (FAIL, 4 minor) | правки D-1…D-4 |
 
 ### Промпт роли 1 (дословно, как отправлен)
 
@@ -489,7 +490,7 @@ production-код самому), что осталось для browser-verify.
 
 Решение разработчика по разблокировке: _будет записано_.
 
-Коммит после роли: _будет записан_.
+Коммит после роли: `555e628` (общий коммит записей ролей 18–20, три попытки BLOCKED и найденная причина).
 
 ### Роль 19 `/browser-verify` (попытка 2, вариант A: BLOCKED)
 
@@ -527,7 +528,7 @@ production-код самому), что осталось для browser-verify.
 
 Решение разработчика: _будет записано_.
 
-Коммит после роли: _будет записан_.
+Коммит после роли: `555e628` (общий коммит записей ролей 18–20, три попытки BLOCKED и найденная причина).
 
 ### Роль 20 `/browser-verify` (попытка 3: BLOCKED)
 
@@ -562,6 +563,36 @@ production-код самому), что осталось для browser-verify.
 Диагностика после попытки (моя, не evidence роли): 1) `/opt/google/chrome/chrome --headless=new --dump-dom about:blank` из шелла сессии отработал (пустой DOM), то же у разработчика через `!`; 2) процессы демона адаптера unconfined, в init-userns, без seccomp, с переменной в окружении: дело не в песочнице Claude Code; 3) `agent-browser.mjs --session diag-probe open about:blank` без флага упал с тем же `No usable sandbox!`; 4) `agent-browser.mjs --session diag-probe2 --executable-path /opt/google/chrome/chrome open about:blank` прошёл (`✓ about:blank`) и был закрыт командой `close` с тем же флагом; `close` без флага пытается запустить Chrome и падает. Вывод: переменная `AGENT_BROWSER_EXECUTABLE_PATH` адаптером фактически не применяется, без явного `--executable-path` он запускает другой Chrome (скорее всего, без профиля AppArmor с `userns`), с флагом работает системный Chrome. Пробные сессии `diag-probe` и `diag-probe2` закрыты, код и документы не менялись.
 
 Решение разработчика: _будет записано_ (рекомендация: передавать `--executable-path /opt/google/chrome/chrome` в каждой команде адаптера, включая `close`, либо зафиксировать путь в конфиге адаптера).
+
+Коммит после роли: `555e628` (общий коммит записей ролей 18–20, три попытки BLOCKED и найденная причина).
+
+### Роль 21 `/browser-verify` (попытка 4: FAIL, 4 minor)
+
+Промпт (дословно из транскрипта основной сессии, `<command-args>` команды `/browser-verify`; отправлен 2026-11-09T14:48:48Z = 15:48:48 CET; агент 14:49:02Z–14:59:36Z):
+
+```text
+Запусти изолированного агента browser-verify через Task/Agent tool, а саму работу роли в основной сессии не делай. Проверь в реальном браузере приложение TASK-001 (React-приложение со списком сессий, деталями и формой создания) по разделу 5 и строкам «BV» таблицы покрытия tasks/TASK-001/implementation-plan.md, а также по tasks/TASK-001/requirements.md (версия 3, AC-1…AC-8) и tasks/TASK-001/ui-design.md. Код, документы, конфигурации и зависимости не меняй, ничего не ставь, коммиты не делай. Важно про запуск браузера. Три прошлые попытки закончились BLOCKED с ошибкой `No usable sandbox!`. Причина найдена: адаптер игнорирует переменную AGENT_BROWSER_EXECUTABLE_PATH и без явного флага запускает Chrome без профиля AppArmor. С флагом `--executable-path /opt/google/chrome/chrome` системный Chrome запускается. Поэтому во ВСЕХ командах `node toolchain/bin/agent-browser.mjs` указывай `--executable-path /opt/google/chrome/chrome`, включая первую (`open`) и последнюю (`close`): `close` без флага сам пытается запустить Chrome и падает. Не используй `--no-sandbox` и другие обходы защиты; если запуск с флагом всё же упадёт, остановись с вердиктом BLOCKED и приведи точный текст ошибки. Порядок работы:
+1. Gate: `node toolchain/bin/doctor.mjs --json`. DEGRADED только из-за hooks:codex (PENDING_ACTIVATION) не блокер; блокер, если не готов capability:browser, конфликтуют хуки или не поддерживается Node. Используй только `node toolchain/bin/agent-browser.mjs`; никакого Playwright, global agent-browser или других браузерных инструментов. Первая команда адаптера для твоей сессии: `--session <имя> --executable-path /opt/google/chrome/chrome open <URL>`. Если первый запуск упадёт в песочнице с ошибкой запуска браузера, запроси одобрение запуска вне песочницы и повтори один раз. 2. Приложение: на http://localhost:5173 может работать dev-сервер разработчика (проверь curl). Если отвечает, используй его, не запускай второй и не останавливай этот. Если не отвечает, запусти `npm run dev` в фоне и по окончании останови только свой процесс. Мок MSW работает только в dev; сценарии выбираются через `?scenario=` и VITE_MOCK_SCENARIO, названия возьми из src/mocks/scenarios.ts (сценариев network и malformed в моке нет, их воспроизводи средствами адаптера: например `set offline on` или `network route … --body`). Закрой свою сессию адаптера по окончании (с флагом `--executable-path`); чужие сессии и браузер пользователя не трогай. Что проверить (viewport 1440×900 и 390×844):
+- Список: колонки на 1440, стек строк на 390, без горизонтальной прокрутки и перекрытий; состояния loading, success, empty, no-match, error, network, malformed; фильтры в URL, debounce 300 мс, Back/Forward, «Clear filters» и live-регион после «Clear filters» + «Назад» (M-2), поиск + «Назад» в окне 300 мс (M-3), перезапрос без скачка высоты в empty и no-match (M-4). - Детали: /sessions/:id в нативном dialog, фокус при открытии и возврат при закрытии, Esc (в том числе быстрый двойной), инертность фона, 404 (role=alert, M-5), error с «Try again», формат даты «Monday, Aug 3 at 18:00 (GMT+3)», мобильный формат даты строки списка.
+- Форма создания: открытие из шапки и из empty, поля, значения по умолчанию, ошибки валидации у полей, связь с подсказками, нативные date/time/number, подтверждение закрытия грязной формы, успех и «Open session», «Create another», «Clear filters» при активных фильтрах, сценарии create-error и coaches-error. - Доступность: клавиатура по всем интерактивным элементам, видимый фокус (в том числе рамка строки списка через :has, M-1), prefers-reduced-motion (эмуляция, если адаптер позволяет), цели касания 44px и шрифт полей 16px на 390, safe-area (viewport-fit=cover).
+- Контраст: измерь основные пары (текст, приглушённый текст, кнопки, бейджи статусов, фокус) по значениям, которые адаптер реально отдаёт (computed styles), а не по расчёту из ui-design; если измерить нельзя, так и напиши. - Консоль и сеть: ошибки и предупреждения в консоли, запросы (только /api/…, через MSW service worker), отсутствие прямых обращений к бэкенду и «preview». Доказательства: для каждого пункта указывай viewport, URL, команды адаптера и наблюдаемый результат (пример вывода snapshot -i или computed style), а не вывод «проверено». Скриншоты сохраняй только в tasks/TASK-001/evidence/browser/ с понятными именами; обязательны populated-desktop.png (1440×900) и populated-mobile.png (390×844). Если что-то не удалось проверить, пиши «не проверено» с причиной. Не заявляй результат, которого не наблюдал. Найденные дефекты не исправляй, а перечисли с серьёзностью, шагами воспроизведения и ссылкой на AC. В конце: итоговый вердикт PASS, FAIL или BLOCKED, таблица проверок (пункт, viewport, результат, доказательство), список дефектов и список непроверенного с причинами. Запись артефакта сделает разработчик.
+```
+
+Ответ: [`evidence/responses/21-browser-verify.md`](evidence/responses/21-browser-verify.md) (дословно из SubagentHandback); артефакт [`evidence/browser-verification.md`](evidence/browser-verification.md) записан мной (у роли нет права записи), скриншоты в [`evidence/browser/`](evidence/browser/) (22 файла, в том числе `populated-desktop.png` и `populated-mobile.png`).
+
+Проверка (моя): транскрипт агента в `subagents/` (тип `browser-verify`, Bash 162, Read 14, SubagentHandback 1). Вызовы адаптера `agent-browser.mjs` все с `--executable-path /opt/google/chrome/chrome` (0 без флага), `--no-sandbox` не встречается, в конце `close` с флагом («Browser closed»). `git status`: изменений в `src`, `index.html`, `package.json` нет; новая папка `evidence/browser/`. Dev-сервер разработчика не трогали. В системе остаются процессы демонов адаптера (старые, от прошлых неудачных попыток и от последней сессии), в логе фиксируется как наблюдение. Сами результаты в браузере мной не перепроверялись.
+
+Вердикт агента: FAIL, критичных и серьёзных дефектов нет; 46 пунктов подтверждено наблюдением, 4 дефекта minor:
+- D-1 (AC-3.9, 7.5, ui-design 6.3): при первом открытии формы сразу видна ошибка у Title с `aria-invalid="true"` до ввода и blur; после «Create another» ошибки нет. В коде ошибка показывается только при `touched[key]` или `submitted` (`CreateSessionDialog.tsx:141-143`), то есть расхождение с ожидаемым поведением, причина не установлена.
+- D-2 (AC-7.1, ui-design 8): после «Try again» в списке при ошибке фокус уходит на `BODY`.
+- D-3 (AC-7.8): граница полей ввода `#D7DEE0` на белом даёт 1.36:1 при требовании 3:1 для нетекстовых элементов. Цвет задан токеном `border` из `DESIGN_TOKENS.md` («Dividers and control boundaries»).
+- D-4 (AC-6.3): суффиксы «minutes» и «places» в форме ломаются по буквам (блоки 43×40 и 35×40).
+
+Не дефекты (по усмотрению): `mailto:` в деталях на 390 высотой 19px; расхождение времени старта в списке и деталях на 1–2 минуты (мок «сейчас» при каждом запросе); `document.title` везде «react-test»; второй `replaceState` с тем же URL через ~5.7 с; Back после поиска уходит к предыдущей записи истории (соответствует решению D-1 архитектуры и AC-1.11).
+
+Не проверено агентом: запасной вариант без `:has()` (другого движка нет); озвучка скринридером (проверены роли, текст и порядок в DOM); safe-area на устройстве; сетевой отказ вместо эмуляции `fetch` для `network` и `malformed`; touch и экранная клавиатура, нативные пикеры date и time, повторные отправки при сетевой ошибке POST, Browser Back при открытой форме.
+
+Решения разработчика по D-1…D-4: _будут записаны_.
 
 Коммит после роли: _будет записан_.
 
